@@ -3,6 +3,7 @@
 /* Data segment: define our message string and calculate its length. */
 msg:
     .ascii      "Hello, ARM!\n"
+// msg = "Hello, ARM!\n"
 len = . - msg
 
 .text

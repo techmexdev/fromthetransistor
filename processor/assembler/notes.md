@@ -167,9 +167,7 @@ def assembler:
 
 Implmentation overview:
 - [X] parse source code into commands
-- [ ] parse commands into instruction fields
-  - [ ] parse a instruction
-  - [ ] parse b instruction
-- [ ] map instruction field into binary number
-- [ ] create binary instruction from binary fields numbers
-- [ ] add instruction binary to output file
+for every command
+  - [X] parse commands into instruction fields ('mov r1, r0' -> 'mov', 'r0', 'r1')
+  - [ ] map instruction field into binary number ('mov' -> '001010 01010 01010')
+  - [ ] add instruction binary to output file
