@@ -1,0 +1,9 @@
+0.7
+2020.1
+May 27 2020
+19:59:15
+/home/samsepiol/Code/cpu/cpu.sim/sim_1/behav/xsim/glbl.v,1590624368,verilog,,,,glbl,,,,,,,,
+/home/samsepiol/Code/cpu/cpu.srcs/sim_1/new/ram_testbench.v,1604170843,verilog,,,,ram_testbench,,,,,,,,
+/home/samsepiol/Code/cpu/cpu.srcs/sim_1/new/rom_testbench.v,1604166782,verilog,,,,rom_testbench,,,,,,,,
+/home/samsepiol/Code/cpu/cpu.srcs/sources_1/new/ram.v,1604182461,verilog,,/home/samsepiol/Code/cpu/cpu.srcs/sim_1/new/ram_testbench.v,,ram,,,,,,,,
+/home/samsepiol/Code/cpu/cpu.srcs/sources_1/new/rom.v,1604168157,verilog,,/home/samsepiol/Code/cpu/cpu.srcs/sim_1/new/ram_testbench.v,,rom,,,,,,,,

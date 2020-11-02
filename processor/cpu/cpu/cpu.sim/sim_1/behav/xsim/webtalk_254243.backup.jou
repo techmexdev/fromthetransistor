@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Webtalk v2020.1 (64-bit)
+# SW Build 2902540 on Wed May 27 19:54:35 MDT 2020
+# IP Build 2902112 on Wed May 27 22:43:36 MDT 2020
+# Start of session at: Sat Oct 31 12:35:20 2020
+# Process ID: 254243
+# Current directory: /home/samsepiol/Code/cpu/cpu.sim/sim_1/behav/xsim
+# Command line: wbtcv -mode batch -source /home/samsepiol/Code/cpu/cpu.sim/sim_1/behav/xsim/xsim.dir/rom_testbench_behav/webtalk/xsim_webtalk.tcl -notrace
+# Log file: /home/samsepiol/Code/cpu/cpu.sim/sim_1/behav/xsim/webtalk.log
+# Journal file: /home/samsepiol/Code/cpu/cpu.sim/sim_1/behav/xsim/webtalk.jou
+#-----------------------------------------------------------
+source /home/samsepiol/Code/cpu/cpu.sim/sim_1/behav/xsim/xsim.dir/rom_testbench_behav/webtalk/xsim_webtalk.tcl -notrace
