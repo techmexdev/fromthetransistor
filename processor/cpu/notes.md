@@ -70,3 +70,9 @@ Output: next_instruction
 Contains data (and instructions in a Von neumon architecture)
 Input: select_memory_address, should_write, value 
 Output: RAM[select_memory_address] 
+
+**Notes**
+- clock is outside cpu, and shared between cpu components
+- control unit maintains pipeline state: which pipeline stage are we doing now? decode, fetch, alu, etc.... maybe we should do everything each clock cycle instead?
+- register unit implementation similar to ram
+- control unit maintains cpu state? I thought it contained fetch, decode, execute logic
