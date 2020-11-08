@@ -19,7 +19,6 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-
 module rom #(parameter ADDRESS_DEPTH=1000)(
     input wire i_clock, // TODO: remove clock
     input wire [19:0] i_memory_address,

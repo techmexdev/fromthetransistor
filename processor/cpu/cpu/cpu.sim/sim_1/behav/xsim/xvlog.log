@@ -1,4 +1,0 @@
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/samsepiol/Code/cpu/cpu.srcs/sources_1/new/ram.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module ram
-INFO: [VRFC 10-2263] Analyzing Verilog file "/home/samsepiol/Code/cpu/cpu.srcs/sim_1/new/ram_testbench.v" into library xil_defaultlib
-INFO: [VRFC 10-311] analyzing module ram_testbench

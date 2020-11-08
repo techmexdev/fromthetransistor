@@ -24,22 +24,31 @@
 module cpu_testbench;
 
 reg clock = 0;
-reg [19:0] memory_address = 0;
+reg [19:0] ram_memory_address = 0;
 reg should_write = 0;
 reg [31:0] i_data;
 wire [31:0] o_data;
+
+// Control Unit
+reg start_execution = 0;
 
 always #5
 begin
     clock <= ~clock;
 end
 
-ram ram_chip(
+rom rom_chip(
     .i_clock(clock),
-    .i_memory_address(memory_address),
+    .i_memory_address(pc_out_inst_addr),
+    .o_data(rom_out_data)
+);
+
+register ram_chip (
+    .i_clock(clock),
+    .i_sel(pc_out_inst_addr),
     .i_should_write(ram_should_write),
     .i_data(ram_in_data),
-    .o_data(ram_out_data)
+    .o_data(rom_out_data)
 );
 
 register register_chip(
@@ -50,61 +59,74 @@ register register_chip(
     .o_data(reg_out_data)
 );
 
+control_unit control_unit_chip(
+    .i_clock(clock),
+    .i_decode_en(decode_en_in),
+    .i_alu_en(alu_en_in),
+    .i_writer_en(writer_en_in),
+    .i_fetch(fetch_en_in),
+    .o_decode_en(decode_en_out),
+    .o_alu_en(alu_en_out),
+    .o_writer_en(writer_en_out),
+    .o_fetch(fetch_en_out)
+);
+// turn off fetch chip once we're done
 program_counter program_counter_chip(
     .i_clock(clock),
+    .i_en(fetch_en_out),
     .i_next_inst_addr(inst_next_inst_addr),
-    .i_should_jump(should_jump),
-    .i_should_reset(should_reset),
+    .i_should_jump(inst_should_jump),
+    .i_should_reset(inst_should_reset),
+    .o_done(pc_done),
     .o_instruction(pc_out_inst_addr)
 );
-
-control_unit control_unit_chip(
-    
-);
-
-fetcher fetch_chip(
-    .i_clock(clock),
-    .i_instruction_pointer(pc_out_inst_addr),
-    .i_memory(ram_chip),
-    .o_instruction(curr_instruction)
-);
+assign fetch_en_in = ~pc_done;
 
 decoder decode_chip(
-    .i_instruction(curr_instruction),
+    .i_clock(clock),
+    .i_en(alu_en_out),
+    .i_en(decode_en_out),
+    .i_instruction(rom_out_data),
+    .o_done(decoder_done),
     .o_opcode(inst_opcode),
     .o_condition(inst_condition),
     .o_next_instruction_address(inst_next_inst_addr),
     .o_should_jump(inst_should_jump),
     .o_data_a(inst_data_a),
     .o_data_b(inst_data_b),
-    .o_should_write_reg(inst_should_write_reg),
-    .o_should_write_mem(inst_should_write_mem),
-    .o_dest_register(inst_dest_register),
-    .o_dest_mem_address(inst_dest_mem_address),
-    .o_imm_value(inst_imm_value)
+    .o_should_reset(inst_should_reset),
+    .o_start_execution(o_start_execution)
 );
+assign decode_en_in = ~decoder_done;
 
 alu alu_chip(
+    .i_clock(clock),
+    .i_start_execution(start_execution),
     .i_opcode(inst_opcode),
     .i_condition(inst_condition),
     .i_data_a(inst_data_a),
-    .o_data_b(inst_data_b),
-    .i_imm_value(inst_imm_value),
+    .i_data_b(inst_data_b),
+    .o_done(alu_done),
     .o_data(alu_out_data)
 );
+assign alu_en_in = ~alu_done;
 
-// can write to either RAM or register
-executer execute_chip(
+writer writer_chip(
     .i_clock(clock),
-    .i_should_write_reg(inst_should_write_reg),
-    .i_should_write_mem(inst_should_write_mem),
-    .i_reg(inst_dests_reg),
-    .i_memory_address(inst_dest_mem_address),
-    .i_data(alu_out_data),
-    .i_reg_chip(register_chip),
-    .i_mem_chip(ram_chip)
-);
+    .i_en(writer_en_out),
+    .i_opcode(inst_opcode),
+    .i_data_a(inst_data_a),
+    .i_data_b(inst_data_b),
+    .i_alu_out_data(alu_out_data),
+    .o_done(writer_done),
+    .o_reg_sel(reg_sel),
+    .o_reg_should_write(reg_should_write),
+    .o_reg_in_data(reg_in_data)
+)
+assign writer_en_in = ~writer_done;
 
+// TODO: add cpu flags as registes. Ex: less_than_0, is_zero, ...
+/*
 initial
 begin
     // Initially empty
@@ -117,3 +139,4 @@ begin
     
 end
 endmodule
+*/
