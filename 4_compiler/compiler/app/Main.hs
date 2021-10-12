@@ -1,19 +1,11 @@
-module Main where
-
-import Lib
-
-main :: IO ()
-main = do
-  putStrLn "Hello"
-  putStrLn "World"
-
-
 data TokenType = NUMBER | STRING | KEYWORD | IDENTIFIER | SYMBOL | OPERATOR
     deriving (Show)
 
-data Token = Token { token :: TokenType, lexeme :: String, literal :: String }
+data Token = Token { token :: TokenType, lexeme :: String, literal :: String, line :: Int }
     deriving (Show)
 
+mapInd :: [a] -> (a -> Int -> b) -> [b]
+mapInd l f = zipWith f l [0..]
 
 takeWhile' :: [a] -> (a -> Bool) -> [a]
 takeWhile' [] _ = []
@@ -47,6 +39,8 @@ isOperator _ = False
 isSymbol :: Char -> Bool
 isSymbol '(' = True
 isSymbol ')' = True
+isSymbol '[' = True
+isSymbol ']' = True
 isSymbol '{' = True
 isSymbol '}' = True
 isSymbol '.' = True
@@ -97,22 +91,22 @@ isAlpha c = not (isSymbol c || isOperator c || isWhiteSpace c)
 
 
 parseOperator :: String -> Token
-parseOperator o = Token { token = OPERATOR, lexeme = o, literal = o }
+parseOperator o = Token { token = OPERATOR, lexeme = o, literal = o, line = 0 }
 
 parseString :: String -> Token
-parseString s = Token { token = STRING, lexeme = s, literal = s }
+parseString s = Token { token = STRING, lexeme = s, literal = s, line = 0 }
 
 parseSymbol :: String -> Token
-parseSymbol s = Token { token = SYMBOL, lexeme = s, literal = s }
+parseSymbol s = Token { token = SYMBOL, lexeme = s, literal = s, line = 0 }
 
 parseNumber :: String -> Token
-parseNumber n = Token { token = NUMBER, lexeme = n, literal = n }
+parseNumber n = Token { token = NUMBER, lexeme = n, literal = n, line = 0 }
 
 parseIdentifier :: String -> Token
-parseIdentifier i = Token { token = IDENTIFIER, lexeme = i, literal = i }
+parseIdentifier i = Token { token = IDENTIFIER, lexeme = i, literal = i, line = 0 }
 
 parseKeyword :: String -> Token
-parseKeyword kw = Token { token = KEYWORD, lexeme = kw, literal = kw }
+parseKeyword kw = Token { token = KEYWORD, lexeme = kw, literal = kw, line = 0 }
 
 parseWord :: String -> Token
 parseWord w | isKeyword w = parseKeyword w
@@ -120,6 +114,9 @@ parseWord w | isKeyword w = parseKeyword w
 
 
 
+
+changeLineNumber :: Int -> Token -> Token
+changeLineNumber l (Token token lexeme literal _) = Token { token = token, lexeme = lexeme, literal = literal, line = l }
 
 -- Tokenizer --
 tokenize :: String -> [Token]
@@ -139,7 +136,12 @@ tokenize (x:xs) | isWhiteSpace x = tokenize xs
                                   rest = drop ((length word) - 1) xs
                               in (parseWord word) : tokenize rest
 
+tokenizeLines :: String -> [[Token]]
+tokenizeLines ls = map (\l -> tokenize (dropWhile' l isWhiteSpace)) (lines ls)
+
+addLineNumbers :: [[Token]] -> [[Token]]
+addLineNumbers ls = mapInd ls (\ts l -> map (\t -> changeLineNumber l t) ts)
 
 parse :: String -> [[Token]]
 parse "" = []
-parse input = map (\l -> tokenize (dropWhile' l isWhiteSpace)) (lines input)
+parse input = addLineNumbers (tokenizeLines input)
