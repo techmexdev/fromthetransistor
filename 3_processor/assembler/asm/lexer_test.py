@@ -1,6 +1,6 @@
 from lexer import Lexer, Token, TokenType
 
-asm_source_code = '''
+input = '''
     mov r0, #10
     mov r1, r0
     num: .short 010
@@ -8,7 +8,7 @@ asm_source_code = '''
     addlt r0, r0, #1
 '''
 
-want_tokens = [
+expected = [
     Token(token_type=TokenType.EOL, literal= '\n'),
 
     Token(token_type=TokenType.MNEMONIC, literal= 'mov'),
@@ -43,25 +43,28 @@ want_tokens = [
     Token(token_type=TokenType.EOL, literal= "\n"),
 ]
 
+
+
 def test():
     lexer = Lexer()
-
-    tokens = lexer.tokenize_instructions(asm_source_code)
+    tokens = lexer.tokenize_instructions(input)
 
     print("Testing the coins...")
-    '''
-    if len(tokens) != len(want_tokens):
-        print(f'have {len(tokens)}, want {len(want_tokens)}')
-        exit()
-    '''
+
+    expect(f'Tokens should have a length of {len(expected)}', len(tokens) == len(expected))
+
     for i in range(len(tokens)):
-        if tokens[i].token_type != want_tokens[i].token_type:
-            print(f'Have token {tokens[i]}, want {want_tokens[i]}')
-            exit()
-        if str(tokens[i].literal) != str(want_tokens[i].literal):
-            print(f'Have token literal `{tokens[i].literal}`, want `{want_tokens[i].literal}`')
-            exit()
-    
+        expect(f'Token {tokens[i]} should be same as {expected[i]}', tokens[i].__str__() == expected[i].__str__())
+
     print("Good coins :3 Tests Passed!")
+
+
+
+def expect(description, cond):
+    if not cond:
+        print(f'FAILURE: {description}')
+        exit()
+    else:
+        print(f'PASS: {description}')
 
 test()
