@@ -32,7 +32,7 @@ def checkError(cond, err):
 
 
 def read_file():
-    checkError((len(sys.argv) < 2), "should specify asm filename. example: python3 main.py asm.a")
+    checkError(len(sys.argv) < 2, "should specify asm filename. example: python3 main.py asm.a")
 
     path = os.path.join(os.getcwd(), f'{sys.argv[1]}')
     asm_file = open(path, 'r')
