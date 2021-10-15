@@ -5,38 +5,46 @@ from assembler import Assembler
 from lexer import Lexer
 
 def main():
-    file_text = get_file_text()
-    assembler = Assembler()
-    lexer = Lexer()
+    file_text = read_file()
 
-    tokens = lexer.tokenize_instructions(file_text) # [[mov, r1, #7], ...]
+    lexer = Lexer()
+    assembler = Assembler()
+
+    tokens = lexer.tokenize_instructions(file_text)
 
     print("look at my coins")
-    for token in tokens:
-        print(token.__str__())
+    map(lambda t: t.__str__(), tokens)
 
     bin_instructions = assembler.assemble_instructions(tokens)
 
     print("look at my binaries")
-    # FIX: write all bin_instructions into a file
-    for bin_inst in bin_instructions:
-        print(bin_inst)
-        
-def get_file_text():
-    if len(sys.argv) < 2:
-        print("should specify asm filename. example: python3 main.py asm.a")
+    print("\n".join(bin_instructions))
+
+    write_file("\n".join(bin_instructions))
+
+
+
+def checkError(cond, err):
+    if cond:
+        print(err)
         exit()
 
-    filename = sys.argv[1]
-    if len(filename) == 0:
-        print("should specify asm filename. example: python3 main.py asm.a")
-        exit()
 
-    path = os.path.join(os.getcwd(), f'3_processor/assembler/asm/{filename}')
+
+def read_file():
+    checkError((len(sys.argv) < 2), "should specify asm filename. example: python3 main.py asm.a")
+
+    path = os.path.join(os.getcwd(), f'{sys.argv[1]}')
     asm_file = open(path, 'r')
     file_text = asm_file.read()
 
     return file_text
+
+def write_file(text):
+    fileName = sys.argv[1]
+    f = open(f'{fileName.split(".")[0]}.bin', "w")
+    f.write(text)
+    f.close()
 
 if __name__ == "__main__":
     main()
