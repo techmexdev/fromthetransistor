@@ -1,3 +1,5 @@
+module Lexer where 
+
 data TokenType = NUMBER | STRING | KEYWORD | IDENTIFIER | SYMBOL | OPERATOR
     deriving (Show)
 
