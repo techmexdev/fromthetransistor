@@ -1,14 +1,5 @@
-## Compiler notes
-
-Follow my repo: https://github.com/techmexdev/fromthetransistor
-Look at repo, ask me questions about what I've already done
-
 ### Compiler
-2. Super tiny compiler implementation in haskell
-3. Super tiny compiler for C
-4. Super tiny compiler outputs arm
 
-#### Super tiny compiler
 Overview: Tokenize -> Parse -> Build AST -> Generate ARM
 
 Compiler explanation
@@ -58,5 +49,6 @@ Let's figure out the structure of an AST...
 3. Transform AST
 
 4. Generate ASM
+
 
 
