@@ -23,16 +23,16 @@ lexerTests = TestLabel "Lexer tests" (TestList [
 
 
 astTests = TestLabel "AST tests" (TestList [
-      TestCase (assertEqual "show AST"
+      TestCase (assertEqual "Unary expression"
         "!a"
         (
          showAST (Unary
            (Token OPERATOR "!" (String "!") 1)
-           (Literal (Token STRING "a" (String "a") 1))
+           (Literal (Token IDENTIFIER "a" (String "a") 1))
           )
         )
       ),
-      TestCase (assertEqual "show AST"
+      TestCase (assertEqual "Binary expression"
         "-123 * 45"
         (
           showAST (Binary
@@ -44,14 +44,33 @@ astTests = TestLabel "AST tests" (TestList [
             (Literal (Token NUMBER "45" (Number 45) 1))
           )
         )
+      ),
+      TestCase (assertEqual "Grouping expression"
+        "(a + (b - c))"
+        (
+          showAST (Grouping
+            (Binary
+              (Literal (Token IDENTIFIER "a" (String "a") 1))
+              (Token OPERATOR "+" (String "+") 1)
+              (Grouping
+                (Binary
+                  (Literal (Token IDENTIFIER "b" (String "b") 1))
+                  (Token OPERATOR "-" (String "-") 1)
+                  (Literal (Token IDENTIFIER "c" (String "c") 1))
+              )
+            )
+          )
+        )
       )
+    )
   ])
 
-tests = hUnitTestToTests $ TestList [lexerTests, astTests]
+tests = TestList [lexerTests, astTests]
+--main = do
+--    defaultMain tests
+
 main = do
-    defaultMain tests
-
-
+    runTestTT tests
 --
 -- 
 -- -- Token types in lox

@@ -1,10 +1,14 @@
-module Lexer where 
+module Lexer where
 
 data TokenType = NUMBER | STRING | KEYWORD | IDENTIFIER | SYMBOL | OPERATOR
-    deriving (Show)
+    | MINUS | INVALID | ILLEGAL | BOOLEAN
+    deriving (Show, Eq)
 
-data Token = Token { token :: TokenType, lexeme :: String, literal :: String, line :: Int }
-    deriving (Show)
+data Token = Token { token :: TokenType, lexeme :: String, literal :: Literal, line :: Int }
+    deriving (Show, Eq)
+
+data Literal = String String | Number Integer | Boolean Bool
+    deriving (Show, Eq)
 
 mapInd :: [a] -> (a -> Int -> b) -> [b]
 mapInd l f = zipWith f l [0..]
@@ -21,6 +25,10 @@ dropWhile' :: [a] -> (a -> Bool) -> [a]
 dropWhile' [] _ = []
 dropWhile' (x:xs) c = if c x then dropWhile' xs c else x : xs
 
+lexemeTokenType :: String -> TokenType
+lexemeTokenType "-" = MINUS
+lexemeTokenType s | length s == 1 && isOperator (head s) = OPERATOR
+lexemeTokenType _ = INVALID
 
 isWhiteSpace :: Char -> Bool
 isWhiteSpace c = c == ' '
@@ -66,7 +74,7 @@ isDigit _ = False
 
 isNumber :: Char -> String -> Bool
 isNumber n ns | isDigit n = True
-              | isSymbol n  && n == '.' = (length ns > 0) && isDigit (ns!!0)
+              | isSymbol n && n == '.' = (length ns > 0) && isDigit (ns!!0)
               | isSymbol n && n == ',' = length ns >= 3 && isDigit (ns!!0) && isDigit (ns!!1) && isDigit (ns!!2)
               | otherwise = False
 
@@ -89,26 +97,23 @@ isKeyword _ = False
 isAlpha :: Char -> Bool
 isAlpha c = not (isSymbol c || isOperator c || isWhiteSpace c)
 
-
-
-
 parseOperator :: String -> Token
-parseOperator o = Token { token = OPERATOR, lexeme = o, literal = o, line = 0 }
+parseOperator o = Token { token = lexemeTokenType o, lexeme = o, literal = (String o), line = 0 }
 
 parseString :: String -> Token
-parseString s = Token { token = STRING, lexeme = s, literal = s, line = 0 }
+parseString s = Token { token = STRING, lexeme = s, literal = (String s), line = 0 }
 
 parseSymbol :: String -> Token
-parseSymbol s = Token { token = SYMBOL, lexeme = s, literal = s, line = 0 }
+parseSymbol s = Token { token = SYMBOL, lexeme = s, literal = (String s), line = 0 }
 
 parseNumber :: String -> Token
-parseNumber n = Token { token = NUMBER, lexeme = n, literal = n, line = 0 }
+parseNumber n = Token { token = NUMBER, lexeme = n, literal = (Number (read n)), line = 0 }
 
 parseIdentifier :: String -> Token
-parseIdentifier i = Token { token = IDENTIFIER, lexeme = i, literal = i, line = 0 }
+parseIdentifier i = Token { token = IDENTIFIER, lexeme = i, literal = (String i), line = 0 }
 
 parseKeyword :: String -> Token
-parseKeyword kw = Token { token = KEYWORD, lexeme = kw, literal = kw, line = 0 }
+parseKeyword kw = Token { token = KEYWORD, lexeme = kw, literal = (String kw), line = 0 }
 
 parseWord :: String -> Token
 parseWord w | isKeyword w = parseKeyword w
@@ -142,7 +147,7 @@ tokenizeLines :: String -> [[Token]]
 tokenizeLines ls = map (\l -> tokenize (dropWhile' l isWhiteSpace)) (lines ls)
 
 addLineNumbers :: [[Token]] -> [[Token]]
-addLineNumbers ls = mapInd ls (\ts l -> map (\t -> changeLineNumber l t) ts)
+addLineNumbers ls = mapInd ls (\ts l -> map (\t -> changeLineNumber (l + 1) t) ts)
 
 parse :: String -> [[Token]]
 parse "" = []
