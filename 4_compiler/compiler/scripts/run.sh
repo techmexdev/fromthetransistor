@@ -1,1 +1,1 @@
-stack run "${@}"
+cabal run compiler "${@}"

@@ -1,1 +1,1 @@
-stack build "${@}"
+cabal build "${@}"

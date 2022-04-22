@@ -34,10 +34,10 @@ isPrimary (Token token lexeme literal line) = token == NUMBER || token == STRING
 primary :: Token -> Expression Token
 primary t = if isPrimary t then Literal t else Literal (illegalize t)
 
-unary :: [Token] -> Expression Token -> Expression Token
-unary _ (t:[]) = primary t
-unary prev (t:ts) = if isUnaryOperator t then Unary t (unary ts) else if isFactorOperator t then Factor (prev t (unary t ts)) else primary t
-
+-- unary :: [Token] -> Expression Token -> Expression Token
+-- unary _ (t:[]) = primary t
+-- unary prev (t:ts) = if isUnaryOperator t then Unary t (unary ts) else if isFactorOperator t then Factor (prev t (unary t ts)) else primary t
+-- 
 -- factor :: [Token] -> Expression Token
 -- factor (t:ts) = let leftUnary = unary (t:ts)
 --                     afterUnary = dropWhile' (t:ts) isPartOfUnary (leftUnary)

@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-stack test "${@}"
+cabal test --test-log=/dev/stdin --verbose=0 "${@}"
