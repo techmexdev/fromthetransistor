@@ -51,4 +51,5 @@ Let's figure out the structure of an AST...
 4. Generate ASM
 
 
-
+---
+## Tokenize

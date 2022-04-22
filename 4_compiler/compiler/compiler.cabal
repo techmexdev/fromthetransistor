@@ -8,9 +8,9 @@ cabal-version: 1.12
 
 name:           compiler
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/githubuser/compiler#readme>
-homepage:       https://github.com/githubuser/compiler#readme
-bug-reports:    https://github.com/githubuser/compiler/issues
+description:    Please see the README on GitHub at <https://github.com/techmexdev/compiler#readme>
+homepage:       https://github.com/techmexdev/compiler#readme
+bug-reports:    https://github.com/techmexdev/compiler/issues
 author:         Author name here
 maintainer:     example@example.com
 copyright:      2020 Author name here
@@ -23,11 +23,12 @@ extra-source-files:
 
 source-repository head
   type: git
-  location: https://github.com/githubuser/compiler
+  location: https://github.com/techmexdev/compiler
 
 library
   exposed-modules:
-      Lib
+      Lexer
+      AST
   other-modules:
       Paths_compiler
   hs-source-dirs:
@@ -36,29 +37,22 @@ library
       base >=4.7 && <5
   default-language: Haskell2010
 
-executable compiler-exe
-  main-is: Main.hs
-  other-modules:
-      Paths_compiler
-  hs-source-dirs:
-      app
+executable compiler
+  main-is: ./src/Main.hs
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
     , compiler
   default-language: Haskell2010
 
-test-suite compiler-test
+test-suite test
   type: exitcode-stdio-1.0
-  main-is: Test.hs
-  other-modules:
-      Paths_compiler
-  -- hs-source-dirs:
-      -- test
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  main-is: test.hs
+  hs-source-dirs:
+     testsuite
   build-depends:
-      base >=4.7 && <5
-    , compiler
+      compiler
+    , base >=4.7 && <5
     , test-framework-hunit
     , test-framework
     , HUnit
