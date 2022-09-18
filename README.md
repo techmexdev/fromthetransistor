@@ -161,6 +161,23 @@ Look at implementation
 # Coding an assembler
 > Coding an assembler(Python, 500) -- Straightforward and boring, write in python. Happens in parallel with the CPU building. Teaches you ARM assembly. Initially outputs just binary files, but changed when you write a linker.
 
+## Overview:
+Input: ARM assembly instructions file
+  Example:
+  // hello.arm
+  mov r1, #7
+  mov r2, r5
+  cmp r2, #5
+  ldr r2, r5
+  addlt r0, r0, #1
+Output: File with a binary instruction in each line
+  1110 00 1 1101 0 0000 0001 000000000111
+  1110 00 0 1101 0 0000 0010 000000000101
+  1110 00 1 1010 1 0010 0000 000000000101
+  1110 010 0 0 0 0 1 0101 0010 000000000000
+  1011 001 0 1 0 0 0 0000 0000 000000000001
+
+
 ## Stack
 Stack pointer: points to top of stack.
 every memory address holds a byte
@@ -174,31 +191,38 @@ every memory address holds a byte
 
 stack grows from high address, to lower address
 ```
+Questions:
+- Why a stack?
+  - Newest program objects are expected to live for a short while. Imagine a function call, it's variables are loaded into memory, and then discarded. A pointer to the stack makes it faster to remove these variables.
+  - Stack size is tied to the creation and execution of process threads
+- Why start growing memory from the last address?
+  - The stack can grow either upwards or downwards depending on the architecture, as long as it starts from opposite ends of the heap.
 
+## Heap
+Used for allocating memory dynamically: variables. The heap is created as the application starts. In the application's runtime, when a variable gets created it is placed in the heap.
+
+## Threads
+Independent execution contexts of a process that have their own stack and share the same memory as the process.
 ## Link register
-Link register: parent function memory address
-example:
+When using `bl` branch instructions, the link register keeps track of the next instruction.
+We need it so when a function finishes, we execute the instruction after the function call, just like we expect with modern progarmming languages.
 
-with function calls:
-```
-a()
-b()
-c()
-```
-corresponding lrs
-```
-a()
-lr = b
+Example usage:
+```arm
+.global: _start
+_start:
+  // instructions...
+  bl func
+  // next instructions
 
-b()
-lr = c
-
-c()
+func:
+  // instructions
+  bx lr // go to instruction after the branch started
 ```
 
 ## CPSR
 Current Program Status Register (CPSR): Holds state of last excecution.
-Example: wether there was a carry bit, negative value, if we're in privileged mode, ...
+Example: whether there was a carry bit, negative value, if we're in privileged mode, ...
 
 ## ARM vs Thumb
 ARM VS Thumb (arm state)
@@ -210,18 +234,6 @@ Thumb:
 - Usuually instructions are 16-bit, can be 32-bit if need be.
 - Conditional execution by using `IT` instructions (only available on some archs)
 - Useful for exploits, because there's less NULL bytes. Example. 8 = 0000 0000 0000 1000 in 32 bit, 0000 1000 in 16-bit.
-
-### Notes while programming
-When reading PC while debugging, PC will point to two instructions ahead. This is old behavior that is maintained to ensure compatability.
-Carry occurs if result of a subtraction is >= 0
-
-Program counter: current instruction memory address plus word length (8 in a 32-bit arch)
-during branch: holds destination address
-
-#### Questions:
-
-What's up with arm storing first four argruments of a function in first four registers? Only four arguments can be stored at a time? Is a functino an arm instruction?
-
 ## Implementing an assembler
 Assembler: assembly file -> assembler -> machine code
 1. Parse each instruction into an operator, register, memory address, etc
@@ -262,8 +274,19 @@ Example:
 01011100010111000101110001011100
 ```
 
-### ELF (Executable Linux File)
-Includes necessary headers, metadata, and binary program to execute. We need to turn a machine-code file into an ELF file to be able to execute it.
+### ELF (Executable and Linkable Format)
+Makes programs executable. It has instructions for loading code from different files, and shared libraries, and allocating data memory for each of them. It connects your program code, to library code.
+
+Static memory: created at compile time
+Dynamic memory: created at run time
+
+Staic linking: ELF file contains the code for the shared libraries
+Dynamic linking: Resolves code for shared libraries at run time
+
+Relocation: Resolve function calls to code. Used during linking 
+
+Segments: Sets aside memory for code and data for the program, as well as for shared libraries. 
+Sections: Used during linktime
 
 #### Questions
 *How does the asm know which memory address a pre-defined symbol (mnemonic/register/operator) belongs to?*
@@ -330,6 +353,17 @@ for every command
   - [ ] map instruction field into binary number ('mov' -> '001010 01010 01010')
   - [ ] add instruction binary to output file
   
+### Notes while programming
+When reading PC while debugging, PC will point to two instructions ahead. This is old behavior that is maintained to ensure compatability.
+Carry occurs if result of a subtraction is >= 0
+
+Program counter: current instruction memory address plus word length (8 in a 32-bit arch)
+during branch: holds destination address
+
+#### Questions:
+
+What's up with arm storing first four argruments of a function in first four registers? Only four arguments can be stored at a time? Is a functino an arm instruction?
+
 ---
 # Building a ARM7 CPU
 > Building a ARM7 CPU(Verilog, 1500) -- Break this into subchapters. A simple pipeline to start, decode, fetch, execute. How much BRAM do we have? We need at least 1MB, DDR would be hard I think, maybe an SRAM. Simulatable and synthesizable.
@@ -412,6 +446,10 @@ Output: RAM[select_memory_address]
 # Bootrom
 > Coding a bootrom(Assembler, 40) -- This allows code download into RAM over the serial port, and is baked into the FPGA image. Cute test programs run on this.
 
+
+References
+- https://wiki.archlinux.org/title/Arch_boot_process#Boot_loader
+- 
 ---
 
 # Section 4: Compiler: A “high” level language -- 3 weeks
